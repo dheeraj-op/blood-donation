@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BloodLink — Give Life, Find Hope</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── HERO ── */
+    .hero {
+      min-height: calc(100vh - 68px);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4rem;
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero-text { animation: fadeUp 0.7s ease both; }
+    .hero-text .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #FFF0EF; color: var(--blood);
+      padding: 6px 14px; border-radius: 100px;
+      font-size: 0.8rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-text .eyebrow span { width: 8px; height: 8px; background: var(--blood); border-radius: 50%; animation: pulse-drop 1.5s infinite; }
+
+    .hero-text h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: var(--charcoal);
+    }
+    .hero-text h1 .accent { color: var(--blood); }
+    .hero-text p {
+      margin-top: 1.25rem;
+      font-size: 1.1rem;
+      color: var(--mid);
+      max-width: 440px;
+      line-height: 1.7;
+    }
+    .hero-cta {
+      display: flex; align-items: center; gap: 1rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    /* ── HERO VISUAL ── */
+    .hero-visual {
+      animation: fadeUp 0.7s 0.2s ease both;
+      position: relative;
+    }
+    .drop-large {
+      width: 360px; height: 420px;
+      background: linear-gradient(160deg, #E8342A 0%, #8B0000 100%);
+      clip-path: polygon(50% 0%, 100% 55%, 83% 100%, 17% 100%, 0% 55%);
+      margin: 0 auto;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem; padding-top: 3rem;
+      position: relative;
+      box-shadow: 0 32px 80px rgba(192,24,12,0.3);
+    }
+    .drop-large::after {
+      content: '';
+      position: absolute; inset: 4px;
+      clip-path: polygon(50% 0%, 100% 55%, 83% 100%, 17% 100%, 0% 55%);
+      background: linear-gradient(160deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    }
+    .drop-stat {
+      text-align: center; color: #fff; z-index: 1;
+    }
+    .drop-stat .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 900; display: block;
+    }
+    .drop-stat .lbl { font-size: 0.78rem; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .float-card {
+      position: absolute;
+      background: #fff;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.85rem;
+    }
+    .float-card .fc-icon { font-size: 1.3rem; }
+    .float-card strong { display: block; font-weight: 600; font-size: 0.88rem; }
+    .float-card span { color: var(--mid); font-size: 0.78rem; }
+    .float-card-1 { top: 10%; left: -20px; animation: float 3s ease-in-out infinite; }
+    .float-card-2 { bottom: 18%; right: -20px; animation: float 3s 1.5s ease-in-out infinite; }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(24px); }
+      to { opacity:1; transform: none; }
+    }
+
+    /* ── HOW IT WORKS ── */
+    .section { padding: 5rem 2rem; }
+    .section-title {
+      text-align: center; margin-bottom: 3rem;
+    }
+    .section-title h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 900;
+    }
+    .section-title p { color: var(--mid); margin-top: 0.5rem; }
+
+    .steps-grid {
+      max-width: 900px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+    }
+    .step {
+      text-align: center; padding: 2rem 1.5rem;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+    .step-num {
+      width: 48px; height: 48px;
+      background: var(--blood);
+      color: #fff;
+      border-radius: 12px;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .step p { font-size: 0.88rem; color: var(--mid); line-height: 1.6; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      background: var(--blood);
+      padding: 2.5rem 2rem;
+    }
+    .stats-inner {
+      max-width: 1000px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 2rem; text-align: center;
+    }
+    .stat-item { color: #fff; }
+    .stat-item .n {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900;
+      display: block;
+    }
+    .stat-item .l { font-size: 0.82rem; opacity: 0.8; }
+
+    /* ── URGENT REQUESTS PREVIEW ── */
+    .urgent-preview {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 1.25rem;
+    }
+    .request-mini {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 0.75rem;
+      border-left: 4px solid var(--blood);
+    }
+    .request-mini-top { display: flex; align-items: center; gap: 12px; }
+    .request-mini h4 { font-weight: 700; font-size: 0.95rem; }
+    .request-mini p { font-size: 0.82rem; color: var(--mid); }
+    .request-mini-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--charcoal);
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.85rem;
+    }
+    footer a { color: rgba(255,255,255,0.8); text-decoration: none; }
+
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; gap: 2rem; padding: 2rem 1rem; min-height: auto; }
+      .drop-large { width: 260px; height: 300px; }
+      .float-card-1, .float-card-2 { display: none; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="index.html">
+    <div class="drop"></div>
+    <span>BloodLink</span>
+  </a>
+  <div class="nav-links">
+    <a href="dashboard.html">Find Donors</a>
+    <a href="dashboard.html#requests">Requests</a>
+    <a href="login.html" class="btn btn-outline btn-sm">Sign In</a>
+    <a href="login.html#register" class="btn btn-primary btn-sm">Join Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div class="hero-text">
+      <div class="eyebrow"><span></span> Real donors. Real lives saved.</div>
+      <h1>Every Drop<br>of Blood is a<br><span class="accent">Gift of Life.</span></h1>
+      <p>BloodLink connects voluntary blood donors with patients in need — fast, free, and across India. Register as a donor or post a blood request today.</p>
+      <div class="hero-cta">
+        <a href="login.html#register" class="btn btn-primary btn-lg">Become a Donor</a>
+        <a href="dashboard.html#requests" class="btn btn-ghost btn-lg">Request Blood</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="float-card float-card-1">
+        <div class="fc-icon">🩸</div>
+        <div><strong>O− Universal Donor</strong><span>Needed in Mumbai</span></div>
+      </div>
+      <div class="drop-large">
+        <div class="drop-stat"><span class="num" id="counter-donors">0</span><span class="lbl">Registered Donors</span></div>
+        <div class="drop-stat"><span class="num" id="counter-lives">0</span><span class="lbl">Lives Saved</span></div>
+        <div class="drop-stat"><span class="num" id="counter-cities">0</span><span class="lbl">Cities</span></div>
+      </div>
+      <div class="float-card float-card-2">
+        <div class="fc-icon">✅</div>
+        <div><strong>Request Fulfilled!</strong><span>2 units of A+ found</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><span class="n">10,000+</span><span class="l">Registered Donors</span></div>
+    <div class="stat-item"><span class="n">4,200+</span><span class="l">Requests Fulfilled</span></div>
+    <div class="stat-item"><span class="n">8</span><span class="l">Blood Groups</span></div>
+    <div class="stat-item"><span class="n">50+</span><span class="l">Cities Covered</span></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="background: var(--warm-white);">
+  <div class="section-title">
+    <h2>How BloodLink Works</h2>
+    <p>Simple steps. Life-saving impact.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Register as a Donor</h3>
+      <p>Create your free account, enter your blood group and city, and go live in seconds.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Search or Post</h3>
+      <p>Recipients can search available donors by blood group and location, or post a request.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Connect & Save</h3>
+      <p>Contact the donor directly. Every donation can save up to 3 lives.</p>
+    </div>
+  </div>
+</section>
+
+<!-- URGENT REQUESTS PREVIEW -->
+<section class="section">
+  <div class="section-title">
+    <h2>Urgent <em style="font-style:italic;color:var(--blood)">Requests</em> Right Now</h2>
+    <p>These patients need your help today.</p>
+  </div>
+  <div class="urgent-preview" id="urgentPreview"></div>
+  <div style="text-align:center; margin-top:2rem;">
+    <a href="dashboard.html#requests" class="btn btn-outline">View All Requests</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom:0.5rem;">
+    <a href="index.html">BloodLink</a> — Built to save lives.
+  </p>
+  <p>Mock data only · Not a real medical service · <a href="dashboard.html">Enter App</a></p>
+</footer>
+
+<div class="toast-container"></div>
+<script src="js/app.js"></script>
+<script>
+  // Counter animation
+  function animateCounter(el, target, duration = 1600) {
+    let start = 0, step = target / (duration / 16);
+    const tick = () => {
+      start = Math.min(start + step, target);
+      el.textContent = Math.floor(start).toLocaleString();
+      if (start < target) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+  window.addEventListener('load', () => {
+    animateCounter(document.getElementById('counter-donors'), DonorStore.getAll().length);
+    animateCounter(document.getElementById('counter-lives'), 4200);
+    animateCounter(document.getElementById('counter-cities'), CITIES.length);
+  });
+
+  // Urgent requests preview
+  const urgent = RequestStore.getActive().filter(r => r.urgency === 'urgent').slice(0, 3);
+  const container = document.getElementById('urgentPreview');
+  if (urgent.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">🕊️</div><h3>No urgent requests right now</h3><p>Check back later or post your own request.</p></div>';
+  } else {
+    container.innerHTML = urgent.map(r => `
+      <div class="request-mini">
+        <div class="request-mini-top">
+          <div class="blood-badge">${r.blood}</div>
+          <div>
+            <h4>${r.patient}</h4>
+            <p>${r.hospital} · ${r.city}</p>
+          </div>
+        </div>
+        <p style="font-size:0.85rem;color:var(--mid);">${r.note}</p>
+        <div class="request-mini-meta">
+          <span class="badge badge-urgent">Urgent</span>
+          <span style="font-size:0.8rem;color:var(--mid);">${r.units} unit${r.units>1?'s':''} needed</span>
+        </div>
+        <a href="dashboard.html#requests" class="btn btn-primary btn-sm">Help Now →</a>
+      </div>
+    `).join('');
+  }
+</script>
+</body>
+</html>

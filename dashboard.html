@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BloodLink — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* ── LAYOUT ── */
+    .dash-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 68px);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: var(--card-bg);
+      border-right: 1px solid var(--soft);
+      padding: 1.5rem 1rem;
+      position: sticky; top: 68px;
+      height: calc(100vh - 68px);
+      overflow-y: auto;
+      display: flex; flex-direction: column; gap: 0.25rem;
+    }
+    .sidebar-section { font-size: 0.72rem; font-weight: 700; color: var(--mid); text-transform: uppercase; letter-spacing: 0.07em; padding: 1rem 0.75rem 0.5rem; }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      text-decoration: none;
+      color: var(--charcoal);
+      font-size: 0.9rem; font-weight: 500;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+    .sidebar-link:hover { background: var(--soft); }
+    .sidebar-link.active { background: #FFF0EF; color: var(--blood); font-weight: 700; }
+    .sidebar-link .ico { font-size: 1.1rem; width: 22px; text-align: center; }
+
+    .sidebar-user {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid var(--soft);
+    }
+    .user-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0.75rem;
+      border-radius: 12px;
+      background: var(--cream);
+    }
+    .user-avatar {
+      width: 40px; height: 40px; flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--blood); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem;
+    }
+    .user-info strong { display: block; font-size: 0.88rem; font-weight: 700; }
+    .user-info span { font-size: 0.78rem; color: var(--mid); }
+
+    /* ── MAIN CONTENT ── */
+    .dash-main { padding: 2rem; overflow-y: auto; }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900;
+    }
+
+    /* ── SEARCH FILTERS ── */
+    .filter-bar {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      display: flex; gap: 1rem; align-items: flex-end;
+      box-shadow: var(--shadow);
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .filter-bar .form-group { flex: 1; min-width: 140px; }
+    .filter-bar .form-group select,
+    .filter-bar .form-group input { font-size: 0.88rem; padding: 0.6rem 0.85rem; }
+
+    /* ── DONOR GRID ── */
+    .donor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.25rem;
+    }
+    .donor-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      box-shadow: var(--shadow);
+      display: flex; flex-direction: column; gap: 0.85rem;
+      transition: box-shadow 0.2s, transform 0.2s;
+      border: 2px solid transparent;
+    }
+    .donor-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+    .donor-card.unavailable { opacity: 0.65; }
+    .donor-card-top { display: flex; align-items: center; gap: 12px; }
+    .donor-name { font-weight: 700; font-size: 0.95rem; }
+    .donor-meta { font-size: 0.8rem; color: var(--mid); }
+    .donor-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 0.5rem; border-top: 1px solid var(--soft); }
+    .donor-footer .last-donated { font-size: 0.75rem; color: var(--mid); }
+    .donor-footer .avail { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; }
+    .avail.yes { color: #2D7A2D; }
+    .avail.no  { color: #999; }
+    .avail-dot { width: 7px; height: 7px; border-radius: 50%; }
+    .avail.yes .avail-dot { background: #2D7A2D; }
+    .avail.no  .avail-dot { background: #ccc; }
+
+    /* ── REQUEST LIST ── */
+    .request-list { display: flex; flex-direction: column; gap: 1rem; }
+    .request-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1.25rem;
+      border-left: 5px solid var(--soft);
+      transition: box-shadow 0.2s;
+    }
+    .request-card:hover { box-shadow: var(--shadow-lg); }
+    .request-card.urgent { border-left-color: var(--blood); }
+    .request-card.closed { border-left-color: #ccc; opacity: 0.7; }
+    .request-info h4 { font-weight: 700; font-size: 0.95rem; margin-bottom: 3px; }
+    .request-info .meta { font-size: 0.8rem; color: var(--mid); display: flex; gap: 12px; flex-wrap: wrap; }
+    .request-info .meta span { display: flex; align-items: center; gap: 4px; }
+    .request-note { font-size: 0.83rem; color: var(--mid); margin-top: 6px; font-style: italic; }
+    .request-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+
+    /* ── POST REQUEST MODAL ── */
+    .modal-form { display: flex; flex-direction: column; gap: 1rem; }
+    .modal-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* ── PROFILE SECTION ── */
+    .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .profile-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .profile-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .profile-field { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--soft); font-size: 0.9rem; }
+    .profile-field:last-child { border-bottom: none; }
+    .profile-field .lbl { color: var(--mid); }
+    .profile-field .val { font-weight: 600; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .dash-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .dash-main { padding: 1rem; }
+      .request-card { grid-template-columns: auto 1fr; }
+      .request-actions { grid-column: 1/-1; flex-direction: row; }
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 580px) {
+      .donor-grid { grid-template-columns: 1fr; }
+      .filter-bar { flex-direction: column; }
+      .filter-bar .form-group { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html">
+    <div class="drop"></div>
+    <span>BloodLink</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="#" onclick="Auth.logout()" class="btn btn-outline btn-sm">Sign Out</a>
+  </div>
+</nav>
+
+<div class="dash-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">Discover</div>
+    <div class="sidebar-link active" onclick="showSection('donors')" id="nav-donors">
+      <span class="ico">🩸</span> Find Donors
+    </div>
+    <div class="sidebar-link" onclick="showSection('requests')" id="nav-requests">
+      <span class="ico">📋</span> Blood Requests
+    </div>
+
+    <div class="sidebar-section">Account</div>
+    <div class="sidebar-link" onclick="showSection('profile')" id="nav-profile">
+      <span class="ico">👤</span> My Profile
+    </div>
+    <div class="sidebar-link" onclick="Auth.logout()">
+      <span class="ico">🚪</span> Sign Out
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-card" id="sidebarUser"></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="dash-main">
+
+    <!-- ── DONORS SECTION ── -->
+    <div id="section-donors">
+      <div class="section-header">
+        <h2>Find <em style="font-style:italic;color:var(--blood)">Donors</em></h2>
+        <span id="donorCount" style="font-size:0.85rem;color:var(--mid);"></span>
+      </div>
+
+      <div class="filter-bar">
+        <div class="form-group">
+          <label>Blood Group</label>
+          <select id="filterBlood">
+            <option value="">All Groups</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>City</label>
+          <select id="filterCity">
+            <option value="">All Cities</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:0;">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="searchDonors()">Search</button>
+        </div>
+        <div class="form-group" style="flex:0;">
+          <label>&nbsp;</label>
+          <button class="btn btn-ghost" onclick="resetDonors()">Reset</button>
+        </div>
+      </div>
+
+      <div class="donor-grid" id="donorGrid"></div>
+    </div>
+
+    <!-- ── REQUESTS SECTION ── -->
+    <div id="section-requests" style="display:none;">
+      <div class="section-header">
+        <h2>Blood <em style="font-style:italic;color:var(--blood)">Requests</em></h2>
+        <button class="btn btn-primary" onclick="openPostModal()">+ Post Request</button>
+      </div>
+
+      <div class="filter-bar">
+        <div class="form-group">
+          <label>Blood Group</label>
+          <select id="reqFilterBlood">
+            <option value="">All</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="reqFilterStatus">
+            <option value="">All</option>
+            <option value="active">Active</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:0;">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary" onclick="renderRequests()">Filter</button>
+        </div>
+      </div>
+
+      <div class="request-list" id="requestList"></div>
+    </div>
+
+    <!-- ── PROFILE SECTION ── -->
+    <div id="section-profile" style="display:none;">
+      <div class="section-header">
+        <h2>My <em style="font-style:italic;color:var(--blood)">Profile</em></h2>
+      </div>
+      <div class="profile-grid" id="profileGrid"></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- POST REQUEST MODAL -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Post a Blood Request</h2>
+      <button class="modal-close" onclick="closePostModal()">✕</button>
+    </div>
+    <form class="modal-form" id="postForm">
+      <div class="form-group">
+        <label>Patient Name</label>
+        <input type="text" id="reqPatient" placeholder="Full name" required />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Blood Group</label>
+          <select id="reqBlood" required><option value="">Select</option></select>
+        </div>
+        <div class="form-group">
+          <label>Units Needed</label>
+          <input type="number" id="reqUnits" min="1" max="10" value="1" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Hospital</label>
+        <input type="text" id="reqHospital" placeholder="e.g. Apollo Hospital" required />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>City</label>
+          <select id="reqCity" required><option value="">Select</option></select>
+        </div>
+        <div class="form-group">
+          <label>Urgency</label>
+          <select id="reqUrgency">
+            <option value="urgent">🔴 Urgent</option>
+            <option value="normal">🟡 Normal</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Contact Number</label>
+        <input type="tel" id="reqContact" placeholder="98765-43210" required />
+      </div>
+      <div class="form-group">
+        <label>Additional Note</label>
+        <textarea id="reqNote" placeholder="Any important details..."></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary auth-submit" style="width:100%;justify-content:center;">Post Request</button>
+    </form>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="contactModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Contact Donor</h2>
+      <button class="modal-close" onclick="document.getElementById('contactModal').classList.remove('active')">✕</button>
+    </div>
+    <div id="contactModalBody"></div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+<script src="js/app.js"></script>
+<script>
+  Auth.require();
+
+  const user = Auth.current();
+
+  // ── SIDEBAR USER ──
+  const sbu = document.getElementById('sidebarUser');
+  if (user) {
+    sbu.innerHTML = `
+      <div class="user-avatar">${user.name.charAt(0).toUpperCase()}</div>
+      <div class="user-info">
+        <strong>${user.name.split(' ')[0]}</strong>
+        <span class="blood-badge" style="width:auto;height:auto;padding:2px 8px;font-size:0.72rem;border-radius:6px;">${user.blood || '—'}</span>
+      </div>`;
+  }
+
+  // ── POPULATE SELECTS ──
+  ['filterBlood','reqFilterBlood','reqBlood'].forEach(id => {
+    const el = document.getElementById(id);
+    BLOOD_GROUPS.forEach(g => el.insertAdjacentHTML('beforeend', `<option value="${g}">${g}</option>`));
+  });
+  ['filterCity','reqCity'].forEach(id => {
+    const el = document.getElementById(id);
+    CITIES.forEach(c => el.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
+  });
+
+  // ── SECTION SWITCHING ──
+  const sections = ['donors','requests','profile'];
+  function showSection(name) {
+    sections.forEach(s => {
+      document.getElementById('section-'+s).style.display = s === name ? 'block' : 'none';
+      document.getElementById('nav-'+s)?.classList.toggle('active', s === name);
+    });
+    if (name === 'donors')   renderDonors(DonorStore.getAll());
+    if (name === 'requests') renderRequests();
+    if (name === 'profile')  renderProfile();
+    window.location.hash = name;
+  }
+
+  // ── DONORS ──
+  function renderDonors(donors) {
+    const grid = document.getElementById('donorGrid');
+    document.getElementById('donorCount').textContent = donors.length + ' donor' + (donors.length !== 1 ? 's' : '') + ' found';
+    if (!donors.length) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">🔍</div><h3>No donors found</h3><p>Try a different blood group or city.</p></div>';
+      return;
+    }
+    grid.innerHTML = donors.map(d => `
+      <div class="donor-card ${!d.available ? 'unavailable' : ''}">
+        <div class="donor-card-top">
+          <div class="blood-badge">${d.blood}</div>
+          <div>
+            <div class="donor-name">${d.name}</div>
+            <div class="donor-meta">📍 ${d.city} · Age ${d.age || '—'}</div>
+          </div>
+        </div>
+        <div class="donor-footer">
+          <span class="last-donated">Last donated: ${d.lastDonated || 'No record'}</span>
+          <span class="avail ${d.available ? 'yes' : 'no'}">
+            <span class="avail-dot"></span>
+            ${d.available ? 'Available' : 'Unavailable'}
+          </span>
+        </div>
+        ${d.available ? `<button class="btn btn-primary btn-sm" onclick="openContactModal(${JSON.stringify(d).replace(/"/g,'&quot;')})">Contact →</button>` : `<button class="btn btn-ghost btn-sm" disabled>Not available</button>`}
+      </div>
+    `).join('');
+  }
+
+  function searchDonors() {
+    const blood = document.getElementById('filterBlood').value;
+    const city  = document.getElementById('filterCity').value;
+    const results = DonorStore.search({ blood, city });
+    renderDonors(results);
+  }
+  function resetDonors() {
+    document.getElementById('filterBlood').value = '';
+    document.getElementById('filterCity').value  = '';
+    renderDonors(DonorStore.getAll());
+  }
+
+  // ── REQUESTS ──
+  function renderRequests() {
+    const blood  = document.getElementById('reqFilterBlood').value;
+    const status = document.getElementById('reqFilterStatus').value;
+    let reqs = RequestStore.getAll();
+    if (blood)  reqs = reqs.filter(r => r.blood === blood);
+    if (status) reqs = reqs.filter(r => r.status === status);
+    // Sort: urgent first
+    reqs.sort((a,b) => (a.urgency === 'urgent' ? -1 : 1));
+
+    const list = document.getElementById('requestList');
+    if (!reqs.length) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">📋</div><h3>No requests found</h3><p>Post the first request!</p></div>';
+      return;
+    }
+    list.innerHTML = reqs.map(r => `
+      <div class="request-card ${r.urgency} ${r.status}">
+        <div class="blood-badge" style="width:52px;height:52px;font-size:0.9rem;">${r.blood}</div>
+        <div class="request-info">
+          <h4>${r.patient} <span style="font-weight:400;color:var(--mid);font-size:0.85rem;">· ${r.units} unit${r.units>1?'s':''}</span></h4>
+          <div class="meta">
+            <span>🏥 ${r.hospital}</span>
+            <span>📍 ${r.city}</span>
+            <span>📅 ${r.date}</span>
+          </div>
+          <div class="request-note">${r.note}</div>
+        </div>
+        <div class="request-actions">
+          <span class="badge badge-${r.urgency === 'urgent' ? 'urgent' : (r.status === 'closed' ? 'closed' : 'active')}">${r.urgency === 'urgent' ? '🔴 Urgent' : (r.status === 'closed' ? 'Closed' : 'Active')}</span>
+          ${r.status === 'active' ? `<button class="btn btn-primary btn-sm" onclick="callContact('${r.contact}','${r.postedBy}')">📞 ${r.contact}</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function callContact(phone, name) {
+    toast(`Contacting ${name} at ${phone}`, 'success');
+  }
+
+  // ── POST REQUEST MODAL ──
+  function openPostModal() {
+    if (!user) { toast('Please sign in to post a request.', 'error'); return; }
+    document.getElementById('postModal').classList.add('active');
+  }
+  function closePostModal() {
+    document.getElementById('postModal').classList.remove('active');
+    document.getElementById('postForm').reset();
+  }
+  document.getElementById('postModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closePostModal();
+  });
+
+  document.getElementById('postForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const req = {
+      patient: document.getElementById('reqPatient').value.trim(),
+      blood:   document.getElementById('reqBlood').value,
+      units:   +document.getElementById('reqUnits').value,
+      hospital:document.getElementById('reqHospital').value.trim(),
+      city:    document.getElementById('reqCity').value,
+      urgency: document.getElementById('reqUrgency').value,
+      contact: document.getElementById('reqContact').value.trim(),
+      note:    document.getElementById('reqNote').value.trim(),
+      postedBy: user.name,
+    };
+    if (!req.blood || !req.city) { toast('Please fill all required fields.', 'error'); return; }
+    RequestStore.add(req);
+    closePostModal();
+    renderRequests();
+    toast('Request posted successfully!', 'success');
+  });
+
+  // ── CONTACT DONOR MODAL ──
+  function openContactModal(donor) {
+    const body = document.getElementById('contactModalBody');
+    body.innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.5rem;">
+        <div class="blood-badge" style="width:56px;height:56px;">${donor.blood}</div>
+        <div>
+          <div style="font-weight:700;font-size:1rem;">${donor.name}</div>
+          <div style="font-size:0.85rem;color:var(--mid);">📍 ${donor.city} · Age ${donor.age || '—'}</div>
+        </div>
+      </div>
+      <div class="profile-field"><span class="lbl">Phone</span><span class="val">${donor.phone || 'Not provided'}</span></div>
+      <div class="profile-field"><span class="lbl">Last Donated</span><span class="val">${donor.lastDonated || 'No record'}</span></div>
+      <div class="profile-field"><span class="lbl">Availability</span><span class="val" style="color:var(--blood);">✓ Available</span></div>
+      <div style="margin-top:1.5rem;display:flex;gap:1rem;">
+        ${donor.phone ? `<a href="tel:${donor.phone}" class="btn btn-primary" style="flex:1;justify-content:center;">📞 Call Now</a>` : ''}
+        <button class="btn btn-ghost" onclick="document.getElementById('contactModal').classList.remove('active')" style="flex:1;">Close</button>
+      </div>
+    `;
+    document.getElementById('contactModal').classList.add('active');
+  }
+  document.getElementById('contactModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('active');
+  });
+
+  // ── PROFILE ──
+  function renderProfile() {
+    const u = Auth.current();
+    if (!u) return;
+    const grid = document.getElementById('profileGrid');
+    grid.innerHTML = `
+      <div class="profile-card">
+        <h3>🩸 Personal Info</h3>
+        <div class="profile-field"><span class="lbl">Full Name</span><span class="val">${u.name}</span></div>
+        <div class="profile-field"><span class="lbl">Email</span><span class="val">${u.email}</span></div>
+        <div class="profile-field"><span class="lbl">Age</span><span class="val">${u.age || '—'}</span></div>
+        <div class="profile-field"><span class="lbl">Phone</span><span class="val">${u.phone || '—'}</span></div>
+        <div class="profile-field"><span class="lbl">Role</span><span class="val" style="text-transform:capitalize;">${u.role}</span></div>
+      </div>
+      <div class="profile-card">
+        <h3>🏥 Donor Details</h3>
+        <div class="profile-field"><span class="lbl">Blood Group</span>
+          <span class="val" style="display:flex;align-items:center;gap:8px;">
+            <span class="blood-badge" style="width:36px;height:36px;font-size:0.8rem;">${u.blood || '—'}</span> ${u.blood || 'Not set'}
+          </span>
+        </div>
+        <div class="profile-field"><span class="lbl">City</span><span class="val">${u.city || '—'}</span></div>
+        <div class="profile-field"><span class="lbl">Donor Status</span><span class="val" style="color:${u.role==='donor'?'#2D7A2D':'var(--mid)'};">${u.role==='donor'?'✓ Active Donor':'Not registered as donor'}</span></div>
+        ${u.role === 'recipient' ? `<div style="margin-top:1rem;"><a href="#" onclick="switchToDonor()" class="btn btn-outline btn-sm">Register as Donor too</a></div>` : ''}
+      </div>
+    `;
+  }
+
+  function switchToDonor() {
+    const users = JSON.parse(localStorage.getItem('bl_users') || '[]');
+    const idx = users.findIndex(u => u.id === user.id);
+    if (idx > -1) {
+      users[idx].role = 'donor';
+      localStorage.setItem('bl_users', JSON.stringify(users));
+      Auth.login(users[idx]);
+      DonorStore.add({ name: user.name, blood: user.blood, city: user.city, age: user.age, phone: user.phone, lastDonated: null });
+      toast('You are now registered as a donor!', 'success');
+      renderProfile();
+    }
+  }
+
+  // ── INIT ──
+  const hash = window.location.hash.replace('#','') || 'donors';
+  showSection(sections.includes(hash) ? hash : 'donors');
+</script>
+</body>
+</html>

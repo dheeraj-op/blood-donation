@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BloodLink — Sign In / Register</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+
+    .auth-wrap {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 68px);
+    }
+
+    /* ── LEFT PANEL ── */
+    .auth-panel-left {
+      background: linear-gradient(160deg, var(--blood) 0%, var(--blood-dark) 100%);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 3rem;
+      position: relative; overflow: hidden;
+    }
+    .auth-panel-left::before {
+      content: '';
+      position: absolute; top: -80px; right: -80px;
+      width: 300px; height: 300px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .auth-panel-left::after {
+      content: '';
+      position: absolute; bottom: -60px; left: -60px;
+      width: 250px; height: 250px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .auth-panel-left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      font-weight: 900; color: #fff;
+      line-height: 1.15;
+      position: relative; z-index: 1;
+    }
+    .auth-panel-left p {
+      color: rgba(255,255,255,0.75);
+      margin-top: 1rem; font-size: 0.95rem; line-height: 1.7;
+      position: relative; z-index: 1; max-width: 340px;
+    }
+    .blood-facts {
+      margin-top: 2.5rem;
+      display: flex; flex-direction: column; gap: 1rem;
+      position: relative; z-index: 1;
+    }
+    .fact {
+      display: flex; align-items: flex-start; gap: 12px;
+      color: rgba(255,255,255,0.9); font-size: 0.88rem;
+    }
+    .fact .icon {
+      width: 32px; height: 32px; flex-shrink: 0;
+      background: rgba(255,255,255,0.15);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+
+    /* ── RIGHT PANEL ── */
+    .auth-panel-right {
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 3rem 2rem;
+      background: var(--warm-white);
+    }
+    .auth-box {
+      width: 100%; max-width: 420px;
+    }
+    .auth-box h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem; font-weight: 900;
+      margin-bottom: 0.25rem;
+    }
+    .auth-box .subtitle { color: var(--mid); font-size: 0.9rem; margin-bottom: 2rem; }
+
+    /* TABS */
+    .auth-tabs {
+      display: flex; gap: 0;
+      background: var(--soft);
+      border-radius: 100px;
+      padding: 4px;
+      margin-bottom: 2rem;
+    }
+    .auth-tab {
+      flex: 1; padding: 0.55rem 1rem;
+      border: none; background: transparent;
+      cursor: pointer; border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600; font-size: 0.88rem;
+      color: var(--mid); transition: all 0.2s;
+    }
+    .auth-tab.active {
+      background: var(--card-bg);
+      color: var(--charcoal);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    /* FORMS */
+    .auth-form { display: none; flex-direction: column; gap: 1.1rem; }
+    .auth-form.active { display: flex; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .auth-submit {
+      margin-top: 0.5rem;
+      width: 100%;
+      justify-content: center;
+      padding: 0.85rem;
+      font-size: 0.95rem;
+    }
+
+    .role-select {
+      display: flex; gap: 1rem;
+    }
+    .role-option {
+      flex: 1;
+      border: 2px solid var(--soft);
+      border-radius: 10px;
+      padding: 0.85rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .role-option:hover { border-color: var(--blood); }
+    .role-option input { display: none; }
+    .role-option.selected { border-color: var(--blood); background: #FFF0EF; }
+    .role-option .r-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+    .role-option .r-label { font-size: 0.82rem; font-weight: 600; }
+    .role-option .r-sub { font-size: 0.75rem; color: var(--mid); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+      .auth-panel-left { display: none; }
+      .auth-panel-right { padding: 2rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="index.html">
+    <div class="drop"></div>
+    <span>BloodLink</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Find Donors</a>
+  </div>
+</nav>
+
+<div class="auth-wrap">
+  <!-- LEFT -->
+  <div class="auth-panel-left">
+    <h2>One donation<br>can save up to<br>three lives.</h2>
+    <p>Join thousands of voluntary blood donors across India. Your few minutes of time could mean everything to someone in need.</p>
+    <div class="blood-facts">
+      <div class="fact"><div class="icon">🩸</div><div>Every 2 seconds, someone in India needs blood.</div></div>
+      <div class="fact"><div class="icon">💪</div><div>Healthy adults can donate every 90 days.</div></div>
+      <div class="fact"><div class="icon">🌍</div><div>BloodLink is 100% free, forever.</div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="auth-panel-right">
+    <div class="auth-box">
+      <h1 id="formTitle">Welcome back</h1>
+      <p class="subtitle" id="formSubtitle">Sign in to your BloodLink account</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Sign In</button>
+        <button class="auth-tab" data-tab="register">Register</button>
+      </div>
+
+      <!-- LOGIN -->
+      <form class="auth-form active" id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit">Sign In →</button>
+        <div class="divider">or</div>
+        <p style="text-align:center;font-size:0.85rem;color:var(--mid);">
+          Don't have an account? <a href="#" onclick="switchTab('register')" style="color:var(--blood);font-weight:600;">Register free</a>
+        </p>
+      </form>
+
+      <!-- REGISTER -->
+      <form class="auth-form" id="registerForm" autocomplete="off">
+        <!-- Role -->
+        <div class="form-group">
+          <label>I am a</label>
+          <div class="role-select">
+            <label class="role-option selected" id="roleDonor">
+              <input type="radio" name="role" value="donor" checked />
+              <span class="r-icon">🩸</span>
+              <span class="r-label">Donor</span>
+              <span class="r-sub">I want to donate</span>
+            </label>
+            <label class="role-option" id="roleRecipient">
+              <input type="radio" name="role" value="recipient" />
+              <span class="r-icon">🏥</span>
+              <span class="r-label">Recipient</span>
+              <span class="r-sub">I need blood</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="regFirst" placeholder="Aarav" required />
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="regLast" placeholder="Sharma" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="regEmail" placeholder="you@example.com" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Blood Group</label>
+            <select id="regBlood" required>
+              <option value="">Select</option>
+              ${BLOOD_GROUPS ? '' : ''}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <select id="regCity" required>
+              <option value="">Select</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="regAge" placeholder="25" min="18" max="65" required />
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="regPhone" placeholder="98765-43210" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="regPassword" placeholder="Min. 6 characters" required minlength="6" />
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-submit">Create Account →</button>
+        <p style="text-align:center;font-size:0.85rem;color:var(--mid);">
+          Already registered? <a href="#" onclick="switchTab('login')" style="color:var(--blood);font-weight:600;">Sign in</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+<script src="js/app.js"></script>
+<script>
+  // Redirect if already logged in
+  Auth.redirectIfLoggedIn();
+
+  // Populate dropdowns
+  const bloodSel = document.getElementById('regBlood');
+  const citySel  = document.getElementById('regCity');
+  BLOOD_GROUPS.forEach(g => bloodSel.insertAdjacentHTML('beforeend', `<option value="${g}">${g}</option>`));
+  CITIES.forEach(c => citySel.insertAdjacentHTML('beforeend', `<option value="${c}">${c}</option>`));
+
+  // Tab switching
+  function switchTab(tab) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    document.querySelectorAll('.auth-form').forEach(f => f.classList.toggle('active', f.id === tab + 'Form'));
+    const isLogin = tab === 'login';
+    document.getElementById('formTitle').textContent = isLogin ? 'Welcome back' : 'Create account';
+    document.getElementById('formSubtitle').textContent = isLogin
+      ? 'Sign in to your BloodLink account'
+      : 'Join thousands of donors across India';
+    if (!isLogin && window.location.hash === '#register') {}
+  }
+
+  document.querySelectorAll('.auth-tab').forEach(t => {
+    t.addEventListener('click', () => switchTab(t.dataset.tab));
+  });
+
+  // Open register tab if hash
+  if (window.location.hash === '#register') switchTab('register');
+
+  // Role toggle
+  document.querySelectorAll('.role-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.role-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    });
+  });
+
+  // LOGIN
+  document.getElementById('loginForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass  = document.getElementById('loginPassword').value;
+    const users = JSON.parse(localStorage.getItem('bl_users') || '[]');
+    const user  = users.find(u => u.email === email && u.password === pass);
+    if (!user) { toast('Invalid email or password.', 'error'); return; }
+    Auth.login(user);
+    toast('Welcome back, ' + user.name.split(' ')[0] + '!', 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 800);
+  });
+
+  // REGISTER
+  document.getElementById('registerForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const first = document.getElementById('regFirst').value.trim();
+    const last  = document.getElementById('regLast').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const blood = document.getElementById('regBlood').value;
+    const city  = document.getElementById('regCity').value;
+    const age   = document.getElementById('regAge').value;
+    const phone = document.getElementById('regPhone').value.trim();
+    const pass  = document.getElementById('regPassword').value;
+    const role  = document.querySelector('input[name="role"]:checked').value;
+
+    if (!blood || !city) { toast('Please select blood group and city.', 'error'); return; }
+
+    const users = JSON.parse(localStorage.getItem('bl_users') || '[]');
+    if (users.find(u => u.email === email)) { toast('Email already registered.', 'error'); return; }
+
+    const newUser = { id: Date.now(), name: first + ' ' + last, email, password: pass, blood, city, age: +age, phone, role };
+    users.push(newUser);
+    localStorage.setItem('bl_users', JSON.stringify(users));
+
+    // Auto-add as donor if role is donor
+    if (role === 'donor') {
+      DonorStore.add({ name: newUser.name, blood, city, age: +age, phone, lastDonated: null });
+    }
+
+    Auth.login(newUser);
+    toast('Account created! Welcome, ' + first + '!', 'success');
+    setTimeout(() => window.location.href = 'dashboard.html', 900);
+  });
+</script>
+</body>
+</html>
